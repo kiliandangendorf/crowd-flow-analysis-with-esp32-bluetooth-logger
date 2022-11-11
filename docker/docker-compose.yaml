@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+
+  # MQTT Broker over TLS
+  mqtts_broker:
+    image: eclipse-mosquitto:2.0.14
+    container_name: mqtts_broker
+    restart: always
+    ports:
+      # expose port to the internet, check firewall rules
+      - 8883:8883
+    volumes:
+      - ./mqtts_broker:/mosquitto/config:ro
+      - ./volumes/mqtt2/data:/mosquitto/data
+      - ./volumes/mqtt2/log:/mosquitto/log
+
+  # Databas
+  mariadb:
+    image: mariadb:10.7.3
+    container_name: mariadb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=qwerty
+      - MYSQL_DATABASE=tracking_data
+      - TZ=Europe/Berlin
+    ports:
+      # bind port to localhost (not available from outside)
+      - 127.0.0.1:3306:3306
+    volumes:
+      - ./volumes/mariadb/mariadb_data:/var/lib/mysql:rw
+
+  # Aggregates Data into Timewindows and save in DB
+  data_aggregation:
+    build: ./data_aggregation/
+    container_name: data_aggregation
+    image: data_aggregation
+    restart: always
+    environment:
+      - TZ=Europe/Berlin
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data_aggregation/files:/files:ro
+    depends_on:
+      - mqtts_broker
+      - mariadb
+
+  # HTTPS Server for Firmware Updates
+  https_server_ota_bins:
+    build: ./https_server_ota_bins/
+    container_name: https_server_ota_bins
+    image: https_server_ota_bins
+    restart: always
+    ports:
+      # expose port to the internet, check firewall rules
+      - 2008:2008
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ./https_server_ota_bins/files:/files:ro

@@ -1,0 +1,4 @@
+#paho-mqtt
+#pysqlite3
+#mariadb
+#python-telegram-bot

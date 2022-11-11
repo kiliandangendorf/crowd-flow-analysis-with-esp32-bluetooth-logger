@@ -1,0 +1,4 @@
+admin:admin_pw
+ota_pub:ota_pw
+reader_ble:reader_pw
+sensor_ble:sensor_pw
