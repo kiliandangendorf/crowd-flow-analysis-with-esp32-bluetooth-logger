@@ -153,3 +153,5 @@ Topic: `ota/BLE/Scanner/<logger-id>`
 
 [Licensed under the MIT License](https://opensource.org/licenses/MIT).
 
+This software was developed in the context of my master thesis, which I wrote in the company [ATMINA Solutions GmbH](https://atmina.de).
+
